@@ -3,7 +3,9 @@ class Archi:
     def __init__(
             self, s_l:float, n_l:int,
             qu_b:int, qd_b:int, r_b:float, n_b:int, c_b:float,
-            div_b=2, m_b=0, k=1.4, w_n=3, tm=4
+            enter:dict,
+            div_b=2, m_b=0, k=1.4, w_n=3, tm=4, bn=1.25, ct=3200,
+            ab=0.15
             ):
 
         # i1.站台有效长度数据计算
@@ -47,6 +49,12 @@ class Archi:
         self.N1_h = qu_b*self.hr/1200
         self.N2_in = qu_b/1200
         self.N2_out = qd_b/1200
+        #endregion
+
+        # i5.出入口设计
+        #region
+        self.enter = {key:(value*k*bn)/ct for key,value in enter.items()}
+        self.enter_stair = {key:(value*div_b*(1+ab))/ct for key,value in enter.items()}
         #endregion
 
     # d1.站台有效长度文本输出(in:len, out:str)
@@ -140,12 +148,39 @@ class Archi:
         text4 = t1 + t2 +t3
         return  text1, text2, text3, text4
 
+    # d5.出入口计算(in:none, out:)
+    def entrance(self):
+        text1 = []
+        for key, value in self.enter.items():
+            v_old = round(value,1)
+            self.enter[key] = max(2.5, round(value,1))
+            text1.append(f"根据计算得{key}通道宽度为{v_old}，同时出入口宽度不小于2.5m，取{self.enter[key]}m。")
+
+        text2 = []
+        for key, value in self.enter_stair.items():
+            v_old = round(value,1)
+            tx1 = ""
+            if v_old > self.enter[key]:
+                self.enter[key] = v_old
+                tx1 = f"，由于楼梯宽度大于对应通道宽度，按楼梯宽度计算"
+            else:
+                self.enter_stair[key] = max(2.5, self.enter[key])
+
+            text2.append(f"根据计算得{key}通道楼梯宽度为{v_old}" +tx1+ f"，取{self.enter_stair[key]}m。")
+
+        return text1, text2
 
 if __name__ == "__main__":
     archi = Archi(
         s_l=22.8, n_l=4,
         qu_b=1950, qd_b=1934, r_b=0.5, n_b=2, c_b=0.7,
-        
+        enter={
+            "A1":810,
+            "A2":810,
+            "B1":448,
+            "B2":471,
+            "C":938
+        }
         )
     # print(archi.l)
     # print(archi.b_b)
@@ -153,13 +188,17 @@ if __name__ == "__main__":
     # print(archi.n_width)
     # print(archi.n)
     # print(enscape)
+    # print(archi.enter)
 
     t1 = archi.len_val()
-    print(f"a.{t1}")
-    t1, t2, t3, enscape = archi.stair_enscape()
-    print(f"b.{t1}\nc.{t2}\nd.{t3}")
-    print(archi.b)
-    t1, t2 = archi.width()
-    print(f"e.{t1}\nf.{t2}")
-    t1, t2, t3, t4 = archi.equ()
-    print(f"g.{t1}\ng.{t2}\ni.{t3}\nj.{t4}")
+    # print(f"a.{t1}")
+    # t1, t2, t3, enscape = archi.stair_enscape()
+    # print(f"b.{t1}\nc.{t2}\nd.{t3}")
+    # print(archi.b)
+    # t1, t2 = archi.width()
+    # print(f"e.{t1}\nf.{t2}")
+    # t1, t2, t3, t4 = archi.equ()
+    # print(f"g.{t1}\ng.{t2}\ni.{t3}\nj.{t4}")
+    
+    t1, t2 = archi.entrance()
+    print(t1, t2)
