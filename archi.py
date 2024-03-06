@@ -107,7 +107,12 @@ class Archi:
         text1 = text1.replace("\n", "").replace(" ", "")
         text2 = text2.replace("\n", "").replace(" ", "")
         text3 = text3.replace("\n", "").replace(" ", "")
-        return text1, text2, text3, enscape
+        self.enscape = enscape
+        return text1, text2, text3
+    
+    # d2.bool
+    def canEnscape(self):
+        return self.enscape
         
     # d3.岛式站台宽度计算(in:none, out:str*2)
     def width(self):
@@ -148,7 +153,7 @@ class Archi:
         text4 = t1 + t2 +t3
         return  text1, text2, text3, text4
 
-    # d5.出入口计算(in:none, out:)
+    # d5.出入口计算(in:none, out:list*2)
     def entrance(self):
         text1 = []
         for key, value in self.enter.items():
@@ -192,7 +197,9 @@ if __name__ == "__main__":
 
     t1 = archi.len_val()
     # print(f"a.{t1}")
-    # t1, t2, t3, enscape = archi.stair_enscape()
+    archi.stair_enscape()
+    ens = archi.canEnscape()
+    print(ens)
     # print(f"b.{t1}\nc.{t2}\nd.{t3}")
     # print(archi.b)
     # t1, t2 = archi.width()
@@ -200,5 +207,5 @@ if __name__ == "__main__":
     # t1, t2, t3, t4 = archi.equ()
     # print(f"g.{t1}\ng.{t2}\ni.{t3}\nj.{t4}")
     
-    t1, t2 = archi.entrance()
-    print(t1, t2)
+    # t1, t2 = archi.entrance()
+    # print(t1, t2)
